@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.college.dao.SourceMapper">
+    <resultMap id="BaseResultMap" type="com.edu.college.pojo.Source">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="filename" jdbcType="VARCHAR" property="filename"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="size" jdbcType="BIGINT" property="size"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="user_id" jdbcType="TIMESTAMP" property="userId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, filename, url, `size`, `type`, create_time, download
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from source
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        select
+        s.id, filename, url, `size`, `type`, create_time, download, u.name uploader,user_id
+        from source s
+        left join user u on u.id = s.user_id
+        <if test="userId!=null">
+            where user_id = #{userId}
+        </if>
+        order by create_time desc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from source
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="delete">
+        delete
+        from source
+        where id = #{id}
+          and user_id = #{userId}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.edu.college.pojo.Source"
+            useGeneratedKeys="true">
+        insert into source (filename, url, `size`,
+                            `type`, user_id)
+        values (#{record.filename,jdbcType=VARCHAR}, #{record.url,jdbcType=VARCHAR}, #{record.size,jdbcType=BIGINT},
+                #{record.type,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective"
+            parameterType="com.edu.college.pojo.dto.MicroAttachment">
+        insert into source
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="record.fileName != null">
+                filename,
+            </if>
+            <if test="record.filePath != null">
+                url,
+            </if>
+            <if test="record.fileSize != null">
+                `size`,
+            </if>
+            <if test="record.fileType != null">
+                `type`,
+            </if>
+            <if test="userId != null">
+                `user_id`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="record.fileName != null">
+                #{record.fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.filePath != null">
+                #{record.filePath,jdbcType=VARCHAR},
+            </if>
+            <if test="record.fileSize != null">
+                #{record.fileSize,jdbcType=BIGINT},
+            </if>
+            <if test="record.fileType != null">
+                #{record.fileType,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.edu.college.pojo.Source">
+        update source
+        <set>
+            <if test="filename != null">
+                filename = #{filename,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="size != null">
+                `size` = #{size,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.edu.college.pojo.Source">
+        update source
+        set filename = #{filename,jdbcType=VARCHAR},
+            url      = #{url,jdbcType=VARCHAR},
+            `size`   = #{size,jdbcType=BIGINT},
+            `type`   = #{type,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="download">
+        update source
+        set download = download + 1
+        where id = #{id}
+    </update>
+</mapper>

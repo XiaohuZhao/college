@@ -6,12 +6,15 @@ import com.edu.college.pojo.Group;
 import com.edu.college.pojo.Role;
 import com.edu.college.service.GroupService;
 import com.edu.college.service.RoleService;
+import com.edu.college.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("groupAndRole")
@@ -21,6 +24,8 @@ public class GroupRoleController {
     private GroupService groupService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("group")
     @LoginRequire("管理员")
@@ -132,5 +137,14 @@ public class GroupRoleController {
     public Response assignGroup(@PathVariable final Integer userId, @PathVariable final List<Integer> groupIds) {
         groupService.assignGroup(userId, groupIds);
         return Response.success();
+    }
+
+    @GetMapping("user/group")
+    @LoginRequire("管理员")
+    @ApiOperation("查询所有用户和他们所对应的组")
+    @ApiImplicitParam(name = "telephone", value = "搜索关键字")
+    public Response groups() {
+        final List<Map<String, Object>> users = userService.groups();
+        return Response.success(users);
     }
 }

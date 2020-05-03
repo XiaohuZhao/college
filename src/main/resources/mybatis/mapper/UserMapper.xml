@@ -46,6 +46,12 @@
         <include refid="Base_Column_List"/>
         from user;
     </select>
+    <select id="getUserAndGroup" resultType="java.util.Map">
+        select u.id userId, u.name username, g.id groupId, g.name groupName
+        from user u
+                 left join user_group ug on u.id = ug.user_id
+                 left join `group` g on ug.group_id = g.id;
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
         from user

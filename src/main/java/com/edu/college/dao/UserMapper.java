@@ -4,6 +4,7 @@ import com.edu.college.pojo.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface UserMapper {
@@ -30,4 +31,6 @@ public interface UserMapper {
     void deleteByTelephone(String telephone);
 
     List<User> list();
+
+    List<Map<String, Object>> getUserAndGroup();
 }

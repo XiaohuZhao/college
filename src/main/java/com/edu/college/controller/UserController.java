@@ -78,7 +78,7 @@ public class UserController {
         return Response.success(user);
     }
 
-    @LoginRequire("管理员")
+    @LoginRequire("系主任")
     @ApiOperation("查询所有用户，需要管理员登录")
     @GetMapping("list")
     public Response list() {

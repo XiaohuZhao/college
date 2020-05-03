@@ -3,6 +3,7 @@ package com.edu.college.service;
 import com.edu.college.pojo.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     User getByPhone(String telephone);
@@ -20,4 +21,6 @@ public interface UserService {
     void removeByTelephone(String telephone);
 
     List<User> list();
+
+    List<Map<String, Object>> groups();
 }

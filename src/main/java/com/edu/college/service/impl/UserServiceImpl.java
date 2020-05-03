@@ -8,6 +8,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -57,5 +58,10 @@ public class UserServiceImpl implements UserService {
     public List<User> list() {
 
         return mapper.list();
+    }
+
+    @Override
+    public List<Map<String, Object>> groups() {
+        return mapper.getUserAndGroup();
     }
 }
