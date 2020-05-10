@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.college.dao.QuestionnaireMapper">
+    <resultMap id="BaseResultMap" type="com.edu.college.pojo.Questionnaire">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+    </resultMap>
+    <resultMap id="ListResultMap" type="com.edu.college.pojo.vo.QuestionnaireVO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="user_id" jdbcType="TIMESTAMP" property="userId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <resultMap id="JoinResultMap" type="com.edu.college.pojo.vo.QuestionnaireVO">
+        <id column="qid" jdbcType="INTEGER" property="id"/>
+        <result column="qtitle" jdbcType="VARCHAR" property="title"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="user_id" jdbcType="TIMESTAMP" property="userId"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <collection property="questions" resultMap="QuestionResultMap">
+        </collection>
+    </resultMap>
+    <resultMap id="QuestionResultMap" type="com.edu.college.pojo.dto.Question">
+        <id column="iid" property="id"/>
+        <result column="qid" property="quesId"/>
+        <result column="ititle" property="title"/>
+        <result column="type" property="type"/>
+        <collection property="choices" ofType="string">
+            <result column="text"/>
+        </collection>
+    </resultMap>
+    <resultMap id="AnswerResultMap" type="com.edu.college.pojo.vo.AnswerVO">
+        <id property="id" column="id"/>
+        <result property="title" column="qTitle"/>
+        <result property="userId" column="user_id"/>
+        <result property="name" column="name"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="answers" ofType="com.edu.college.pojo.vo.AnswerList">
+            <result property="title" column="qiTitle"/>
+            <result property="answer" column="answer"/>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, title, create_time, end_time, description
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from questionnaire
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="list" resultMap="ListResultMap">
+        select q.id,
+               title,
+               end_time,
+               description,
+               create_time,
+               name,
+               q.user_id,
+               end_time &lt; now() expired
+        from questionnaire q
+                 left join user u on u.id = q.user_id
+    </select>
+    <select id="get" resultMap="JoinResultMap">
+        select q.id     qid,
+               q.title  qtitle,
+               q.end_time,
+               q.create_time,
+               q.description,
+               qi.id    iid,
+               u.name,
+               qi.title ititle,
+               qi.type,
+               qc.text
+        from questionnaire q
+                 left join questionnaire_items qi on qi.ques_id = q.id
+                 left join questionnaire_choice qc on qi.id = qc.item_id
+                 left join user u on u.id = q.user_id
+        where q.id = #{id};
+    </select>
+    <select id="answers" resultType="com.edu.college.pojo.vo.AnswerVO">
+        select q.id           id,
+               q.title        title,
+               u.name,
+               u.id           userId,
+               qa.create_time createTime
+        from questionnaire q
+                 left join questionnaire_items qi on qi.ques_id = q.id
+                 left join questionnaire_answer qa on qi.id = qa.item_id
+                 left join user u on u.id = qa.user_id
+        where q.id = #{id}
+        group by q.id, q.title, q.create_time, q.end_time, u.name, u.id, qa.create_time
+        order by qa.create_time desc
+    </select>
+    <select id="viewAnswers" resultMap="AnswerResultMap">
+        select q.id,
+               q.title        qTitle,
+               u.name,
+               qa.user_id,
+               qa.create_time create_time,
+               qa.answer,
+               qi.title       qiTitle
+        from questionnaire q
+                 left join questionnaire_items qi on qi.ques_id = q.id
+                 left join questionnaire_answer qa on qi.id = qa.item_id
+                 left join user u on u.id = qa.user_id
+        where q.id = #{id}
+          and qa.user_id = #{userId}
+    </select>
+    <select id="answered" resultType="java.lang.Boolean">
+        select count(qa.id) > 0
+        from questionnaire q
+                 left join questionnaire_items qi on qi.ques_id = q.id
+                 left join questionnaire_answer qa on qi.id = qa.item_id and qa.user_id = #{userId}
+        where q.id = #{id}
+        group by q.id
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from questionnaire_answer
+        where item_id in (
+            select id
+            from questionnaire_items
+            where ques_id = #{id}
+        );
+        delete
+        from questionnaire_choice
+        where item_id in (
+            select id
+            from questionnaire_items
+            where ques_id = #{id}
+              and type &lt; 3
+        );
+        delete
+        from questionnaire_items
+        where ques_id = #{id};
+        delete
+        from questionnaire
+        where id = #{id,jdbcType=INTEGER};
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.edu.college.pojo.Questionnaire"
+            useGeneratedKeys="true">
+        insert into questionnaire (title, create_time, end_time,
+                                   description, user_id)
+        values (#{title,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
+                #{description,jdbcType=VARCHAR}, #{userId})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.edu.college.pojo.Questionnaire"
+            useGeneratedKeys="true">
+        insert into questionnaire
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                title,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <insert id="saveQuestion" parameterType="com.edu.college.pojo.dto.Question" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+        insert into questionnaire_items (ques_id, title, type)
+            value (#{quesId}, #{title}, #{type});
+    </insert>
+    <insert id="saveChoices">
+        insert into questionnaire_choice (item_id, text)
+        values
+        <foreach collection="choices" item="choice" separator=",">
+            (
+            #{id},#{choice}
+            )
+        </foreach>
+    </insert>
+    <insert id="answer">
+        delete
+        from questionnaire_answer
+        where user_id = #{id}
+        and item_id in
+        <foreach collection="answers" item="answer" open="(" separator="," close=")">
+            #{answer.qid}
+        </foreach>;
+        insert into questionnaire_answer (user_id, item_id, answer)
+        values
+        <foreach collection="answers" item="answer" separator=",">
+            (
+            #{id},#{answer.qid},#{answer.value}
+            )
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.edu.college.pojo.Questionnaire">
+        update questionnaire
+        <set>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.edu.college.pojo.Questionnaire">
+        update questionnaire
+        set title       = #{title,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            end_time    = #{endTime,jdbcType=TIMESTAMP},
+            description = #{description,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
