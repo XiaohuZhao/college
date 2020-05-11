@@ -107,7 +107,7 @@
     </select>
     <select id="selectByUserId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List"/>,<include refid="Blob_Column_List"/>
         from achievement
         <if test="userId!=null">
             where user_id = #{userId}
