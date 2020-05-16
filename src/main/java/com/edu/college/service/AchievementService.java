@@ -7,15 +7,20 @@ import com.edu.college.pojo.dto.ReviewDTO;
 import com.edu.college.pojo.vo.AchievementVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AchievementService {
     void add(AchievementDTO dto, final User user);
 
     void remove(Integer userId, Integer id);
 
-    List<Achievement> list(Integer userId);
+    List<Achievement> list(Integer userId, final String search);
 
     AchievementVO get(Integer id);
 
     void review(Integer id, Integer userId, ReviewDTO review);
+
+    List<Map<String, Integer>> types(Integer userId);
+
+    List<Map<String, Integer>> dates(Integer userId);
 }

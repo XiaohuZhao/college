@@ -107,11 +107,32 @@
     </select>
     <select id="selectByUserId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>,<include refid="Blob_Column_List"/>
+        <include refid="Base_Column_List"/>,
+        <include refid="Blob_Column_List"/>
+        from achievement
+        where 1 = 1
+        <if test="userId!=null">
+            and user_id = #{userId}
+        </if>
+        <if test="search!=''">
+            and (type = #{search} or DATE_FORMAT(publish_time, '%Y') = #{search})
+        </if>
+    </select>
+    <select id="types" resultType="java.util.Map">
+        select type, count(*) amount
         from achievement
         <if test="userId!=null">
             where user_id = #{userId}
         </if>
+        group by type
+    </select>
+    <select id="dates" resultType="java.util.Map">
+        select DATE_FORMAT(publish_time, '%Y') date, count(*) amount
+        from achievement
+        <if test="userId!=null">
+            where user_id = #{userId}
+        </if>
+        group by DATE_FORMAT(publish_time, '%Y');
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
@@ -390,10 +411,10 @@
     </update>
     <update id="review">
         update achievement
-        set status   = #{review.status},
-            comment  = #{review.comment},
+        set status      = #{review.status},
+            comment     = #{review.comment},
             review_time = now(),
-            reviewer = #{userId}
+            reviewer    = #{userId}
         where id = #{id}
     </update>
 </mapper>

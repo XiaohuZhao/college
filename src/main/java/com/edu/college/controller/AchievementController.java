@@ -19,7 +19,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -77,17 +79,22 @@ public class AchievementController {
     @GetMapping("self")
     @LoginRequire
     @ApiOperation("查询自己的成果")
-    public Response list(@ApiIgnore User user) {
-        final List<Achievement> achievements = service.list(user.getId());
-        return Response.success(achievements);
+    public Response list(@ApiIgnore User user, @RequestParam(defaultValue = "") String search) {
+        final List<Achievement> achievements = service.list(user.getId(), search);
+        final List<Map<String, Integer>> types = service.types(user.getId());
+        final List<Map<String, Integer>> dates = service.dates(user.getId());
+        final Map<String, List<?>> data = new HashMap<>(3);
+        data.put("achievements", achievements);
+        data.put("dates", dates);
+        data.put("types", types);
+        return Response.success(data);
     }
 
     @GetMapping("list")
     @LoginRequire("系主任")
     @ApiOperation("系主任查看所有成果")
-    public Response list() {
-        final List<Achievement> achievements = service.list(null);
-        return Response.success(achievements);
+    public Response list(@RequestParam(defaultValue = "") String search) {
+        return list(new User(), search);
     }
 
     @GetMapping("{id}")

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface AchievementMapper {
@@ -26,7 +27,11 @@ public interface AchievementMapper {
 
     AchievementVO get(@Param("id") Integer id);
 
-    List<Achievement> selectByUserId(@Param("userId") Integer userId);
+    List<Achievement> selectByUserId(@Param("userId") Integer userId, final @Param("search") String search);
 
     void review(@Param("id") Integer id, @Param("userId") Integer userId, @Param("review") ReviewDTO review);
+
+    List<Map<String, Integer>> types(Integer userId);
+
+    List<Map<String, Integer>> dates(Integer userId);
 }

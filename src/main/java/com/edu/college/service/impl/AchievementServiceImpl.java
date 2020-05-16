@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,8 +51,8 @@ public class AchievementServiceImpl implements AchievementService {
     }
 
     @Override
-    public List<Achievement> list(final Integer userId) {
-        return mapper.selectByUserId(userId);
+    public List<Achievement> list(final Integer userId, final String search) {
+        return mapper.selectByUserId(userId, search);
     }
 
     @Override
@@ -62,6 +63,16 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     public void review(final Integer id, final Integer userId, final ReviewDTO review) {
         mapper.review(id, userId, review);
+    }
+
+    @Override
+    public List<Map<String, Integer>> types(final Integer userId) {
+        return mapper.types(userId);
+    }
+
+    @Override
+    public List<Map<String, Integer>> dates(final Integer userId) {
+        return mapper.dates(userId);
     }
 
 }
