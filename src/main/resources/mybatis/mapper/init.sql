@@ -205,3 +205,49 @@ create table user_group
 )
     comment '用户-组关联表' collate = utf8mb4_bin;
 
+create table questionnaire
+(
+    id          int auto_increment
+        primary key,
+    title       varchar(255)                       not null comment '问卷标题',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    end_time    date                               not null comment '截止时间',
+    description varchar(255)                       null comment '描述',
+    user_id     int                                not null comment '发起人id'
+)
+    comment '问卷调查' collate = utf8mb4_bin;
+
+create table questionnaire_answer
+(
+    id          int auto_increment
+        primary key,
+    user_id     int                                not null comment '回答人id',
+    item_id     int                                not null comment '问题id',
+    answer      text                               not null comment '答案',
+    create_time datetime default CURRENT_TIMESTAMP not null
+)
+    collate = utf8mb4_bin;
+
+create table questionnaire_choice
+(
+    id      int auto_increment
+        primary key,
+    item_id int          not null comment '问题的id',
+    text    varchar(255) null comment '选项文字'
+)
+    collate = utf8mb4_bin;
+
+create table questionnaire_items
+(
+    id      int auto_increment
+        primary key,
+    title   text          null comment '问题',
+    type    int           not null comment '问题类型
+1 单选题
+2 多选题
+3 填空题
+4 问答题',
+    ques_id int default 0 not null
+)
+    comment '问卷调查题目' collate = utf8mb4_bin;
+
