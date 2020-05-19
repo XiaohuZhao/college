@@ -1,6 +1,8 @@
 package com.edu.college.controller;
 
 import com.edu.college.common.annotations.LoginRequire;
+import com.edu.college.common.page.PageQuery;
+import com.edu.college.common.page.PageResult;
 import com.edu.college.common.ret.Response;
 import com.edu.college.pojo.Achievement;
 import com.edu.college.pojo.Announcement;
@@ -15,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -79,11 +82,11 @@ public class AchievementController {
     @GetMapping("self")
     @LoginRequire
     @ApiOperation("查询自己的成果")
-    public Response list(@ApiIgnore User user, @RequestParam(defaultValue = "") String search) {
-        final List<Achievement> achievements = service.list(user.getId(), search);
+    public Response list(@ApiIgnore User user, @RequestParam(defaultValue = "") String search, PageQuery pageQuery) {
+        final PageResult<Achievement> achievements = service.list(user.getId(), search, pageQuery);
         final List<Map<String, Integer>> types = service.types(user.getId());
         final List<Map<String, Integer>> dates = service.dates(user.getId());
-        final Map<String, List<?>> data = new HashMap<>(3);
+        final Map<String, Object> data = new HashMap<>(3);
         data.put("achievements", achievements);
         data.put("dates", dates);
         data.put("types", types);
@@ -93,8 +96,8 @@ public class AchievementController {
     @GetMapping("list")
     @LoginRequire("系主任")
     @ApiOperation("系主任查看所有成果")
-    public Response list(@RequestParam(defaultValue = "") String search) {
-        return list(new User(), search);
+    public Response list(@RequestParam(defaultValue = "") String search, PageQuery pageQuery) {
+        return list(new User(), search, pageQuery);
     }
 
     @GetMapping("{id}")

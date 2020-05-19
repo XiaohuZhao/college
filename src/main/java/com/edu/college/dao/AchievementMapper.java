@@ -1,5 +1,6 @@
 package com.edu.college.dao;
 
+import com.edu.college.common.page.PageQuery;
 import com.edu.college.pojo.Achievement;
 import com.edu.college.pojo.dto.ReviewDTO;
 import com.edu.college.pojo.vo.AchievementVO;
@@ -27,11 +28,13 @@ public interface AchievementMapper {
 
     AchievementVO get(@Param("id") Integer id);
 
-    List<Achievement> selectByUserId(@Param("userId") Integer userId, final @Param("search") String search);
+    List<Achievement> selectByUserId(@Param("userId") Integer userId, final @Param("search") String search, final @Param("pageQuery") PageQuery pageQuery);
 
     void review(@Param("id") Integer id, @Param("userId") Integer userId, @Param("review") ReviewDTO review);
 
     List<Map<String, Integer>> types(Integer userId);
 
     List<Map<String, Integer>> dates(Integer userId);
+
+    int count(@Param("userId") Integer userId, @Param("search") String search);
 }

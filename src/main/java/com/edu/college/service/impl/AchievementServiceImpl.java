@@ -1,5 +1,7 @@
 package com.edu.college.service.impl;
 
+import com.edu.college.common.page.PageQuery;
+import com.edu.college.common.page.PageResult;
 import com.edu.college.dao.AchievementMapper;
 import com.edu.college.dao.AttachmentMapper;
 import com.edu.college.dao.AuthorMapper;
@@ -51,8 +53,10 @@ public class AchievementServiceImpl implements AchievementService {
     }
 
     @Override
-    public List<Achievement> list(final Integer userId, final String search) {
-        return mapper.selectByUserId(userId, search);
+    public PageResult<Achievement> list(final Integer userId, final String search, final PageQuery pageQuery) {
+        final List<Achievement> achievements = mapper.selectByUserId(userId, search, pageQuery);
+        final int count = mapper.count(userId, search);
+        return new PageResult<>(achievements, count);
     }
 
     @Override

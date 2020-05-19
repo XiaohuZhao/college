@@ -1,5 +1,7 @@
 package com.edu.college.service;
 
+import com.edu.college.common.page.PageQuery;
+import com.edu.college.common.page.PageResult;
 import com.edu.college.pojo.Achievement;
 import com.edu.college.pojo.User;
 import com.edu.college.pojo.dto.AchievementDTO;
@@ -14,7 +16,7 @@ public interface AchievementService {
 
     void remove(Integer userId, Integer id);
 
-    List<Achievement> list(Integer userId, final String search);
+    PageResult<Achievement> list(Integer userId, final String search, final PageQuery pageQuery);
 
     AchievementVO get(Integer id);
 

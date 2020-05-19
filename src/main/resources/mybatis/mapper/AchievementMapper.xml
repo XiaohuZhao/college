@@ -117,6 +117,7 @@
         <if test="search!=''">
             and (type = #{search} or DATE_FORMAT(publish_time, '%Y') = #{search})
         </if>
+        limit #{pageQuery.offset},#{pageQuery.pageSize}
     </select>
     <select id="types" resultType="java.util.Map">
         select type, count(*) amount
@@ -133,6 +134,17 @@
             where user_id = #{userId}
         </if>
         group by DATE_FORMAT(publish_time, '%Y');
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+        select count(*)
+        from achievement
+        where 1 = 1
+        <if test="userId!=null">
+            and user_id = #{userId}
+        </if>
+        <if test="search!=''">
+            and (type = #{search} or DATE_FORMAT(publish_time, '%Y') = #{search})
+        </if>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
