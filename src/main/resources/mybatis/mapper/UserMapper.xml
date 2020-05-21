@@ -68,7 +68,7 @@
         values (#{name,jdbcType=VARCHAR}, #{gender,jdbcType=SMALLINT},
                 #{age,jdbcType=SMALLINT})
     </insert>
-    <insert id="insertSelective" parameterType="com.edu.college.pojo.User">
+    <insert id="insertSelective" parameterType="com.edu.college.pojo.User" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">

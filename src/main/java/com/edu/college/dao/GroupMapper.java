@@ -25,4 +25,8 @@ public interface GroupMapper {
     void deleteByName(String name);
 
     void rename(@Param("name") String name, @Param("newName") String newName);
+
+    void assignGroupForNewUser(Integer id);
+
+    Group getByName(String name);
 }

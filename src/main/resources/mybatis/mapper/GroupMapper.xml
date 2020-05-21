@@ -22,6 +22,10 @@
             where user_id = #{userId}
         </if>
     </select>
+    <select id="getByName" resultType="com.edu.college.pojo.Group">
+        select <include refid="Base_Column_List"/>
+        from `group` where name = #{name}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
         from `group`
@@ -68,4 +72,7 @@
         set name = #{newName}
         where name = #{name}
     </update>
+    <insert id="assignGroupForNewUser">
+        insert into user_group value
+    </insert>
 </mapper>

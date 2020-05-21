@@ -4,9 +4,11 @@ import com.edu.college.common.annotations.LoginRequire;
 import com.edu.college.common.annotations.UpdateRequire;
 import com.edu.college.common.ret.Response;
 import com.edu.college.common.util.verify.LoginToken;
+import com.edu.college.pojo.Group;
 import com.edu.college.pojo.User;
 import com.edu.college.pojo.dto.LoginDTO;
 import com.edu.college.pojo.dto.UserDTO;
+import com.edu.college.service.GroupService;
 import com.edu.college.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,10 +20,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("user")
@@ -31,6 +30,8 @@ public class UserController {
     private LoginToken loginToken;
     @Autowired
     private UserService service;
+    @Autowired
+    private GroupService groupService;
 
     @ApiOperation("用户登录 返回token和用户拥有的角色")
     @PostMapping("login")
@@ -137,6 +138,8 @@ public class UserController {
     public Response add(@RequestBody UserDTO dto) {
         final User user = User.builder().age(dto.getAge()).gender(dto.getGender()).name(dto.getName()).telephone(dto.getNewTelephone()).password(dto.getPassword()).build();
         service.save(user);
+        final Group group = groupService.getByName("教师");
+        groupService.assignGroup(user.getId(), Collections.singletonList(group.getId()));
         return Response.success();
     }
 

@@ -16,4 +16,6 @@ public interface GroupService {
     void assignRole(Integer groupId, List<Integer> roleIds);
 
     void assignGroup(Integer userId, List<Integer> groupIds);
+
+    Group getByName(String name);
 }

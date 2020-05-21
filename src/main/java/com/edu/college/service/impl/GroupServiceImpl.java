@@ -61,4 +61,9 @@ public class GroupServiceImpl implements GroupService {
         userGroupMapper.clearGroups(userId);
         userGroupMapper.assignGroup(userId, groupIds);
     }
+
+    @Override
+    public Group getByName(final String name) {
+        return mapper.getByName(name);
+    }
 }
